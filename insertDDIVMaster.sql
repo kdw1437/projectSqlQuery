@@ -1,0 +1,24 @@
+MERGE INTO val.OTC_DVID_MSTR tgt
+USING (
+    SELECT 
+        ?DATA_ID AS DATA_ID, 
+        ?DATA_NM AS DATA_NM, 
+        ?DVID_TP AS DVID_TP, 
+        ?CRNC_CODE AS CRNC_CODE,
+  		'MANUALLY_INPUT' AS PGM_ID,
+  		'SYSTEM' AS WRKR_ID,
+        '0.0.0.0' AS WORK_TRIP 
+    FROM DUAL
+) src
+ON (tgt.DATA_ID = src.DATA_ID)
+WHEN MATCHED THEN
+    UPDATE SET 
+        tgt.DATA_NM = src.DATA_NM,
+        tgt.DVID_TP = src.DVID_TP,
+        tgt.CRNC_CODE = src.CRNC_CODE,
+        tgt.PGM_ID = src.PGM_ID,
+        tgt.WRKR_ID = src.WRKR_ID,
+        tgt.WORK_TRIP = src.WORK_TRIP
+WHEN NOT MATCHED THEN
+    INSERT (DATA_ID, DATA_NM, DVID_TP, CRNC_CODE, PGM_ID, WRKR_ID, WORK_TRIP, WORK_TIME) 
+    VALUES (src.DATA_ID, src.DATA_NM, src.DVID_TP, src.CRNC_CODE, src.PGM_ID, src.WRKR_ID, src.WORK_TRIP, SYSDATE)
